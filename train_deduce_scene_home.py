@@ -23,41 +23,56 @@ import matplotlib.pyplot as plt
 import resnet
 from config import places_dir
 
+## The name of the models (such as resnet18, AlexNet, etc.)
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 
-
+## argparse helps getting parameters from the command line, and print helpful info when needed (such as wrong arg was passed)
+## the importance of this line is to take the model type (defult is resnet 18)
 parser = argparse.ArgumentParser(description='Training of Scene_Only model for the home environment')
 parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18',
                     help='model architecture: ' +
                         ' | '.join(model_names) +
                         ' (default: resnet18)')
+## the importance of this line is the number of workers which perform multi-process data loading
 parser.add_argument('-j', '--workers', default=1, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
+## the importance of this line is the number of epocs (the def is 90)
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
                     help='number of total epochs to run')
+## if want to start at some epoch number (?) 
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
+## the importance of this line is the number of batch size
 parser.add_argument('-b', '--batch-size', default=1, type=int,
                     metavar='N', help='mini-batch size (default: 256)')
+## the importance of this line is the, currently it's constant
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                     metavar='LR', help='initial learning rate')
+## 
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                     help='momentum')
+## 
 parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)')
+## how often to print information to the scree
 parser.add_argument('--print-freq', '-p', default=10, type=int,
                     metavar='N', help='print frequency (default: 10)')
+## if didn't finish the training, we can resume from the last result. provide path the that epoch
 parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
+## 
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_false',
                     help='use pre-trained model')
+## number of classes that are used.
 parser.add_argument('--num_classes',default=7, type=int, 
                     help='num of class in the model')
 
+## best_prec1 is for the prediction, if the highest result (the label we predict) is the correct one.
+## for best_prec5 for example, we want that the true label will be within the 5 labels with the highest score
 best_prec1 = 0
 
 def main():
