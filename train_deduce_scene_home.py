@@ -94,7 +94,9 @@ def main():
 
     cudnn.benchmark = True
     # Data loading code
-    data_dir = places_dir + '/places365_standard_home'
+    # data_dir = places_dir + '/places365_standard_home'
+    data_dir = places_dir   # check if that works
+
     traindir = os.path.join(data_dir, 'train')
     valdir = os.path.join(data_dir, 'val')
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
