@@ -47,7 +47,7 @@ parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
 ## the importance of this line is the number of batch size
 parser.add_argument('-b', '--batch-size', default=1, type=int,
                     metavar='N', help='mini-batch size (default: 256)')
-## the importance of this line is the, currently it's constant
+## the importance of this line is the learning rate (currently it's constant)
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                     metavar='LR', help='initial learning rate')
 ## 
@@ -79,6 +79,8 @@ def main():
     global args, best_prec1
     args = parser.parse_args()
     print(args)
+
+    ## which model will be used (for WideResnet/AlexNet we need to modify something, else wt just use the name of the model)
     # create model
     print("=> creating model '{}'".format(args.arch))
     if args.arch.lower().startswith('wideresnet'):
@@ -94,6 +96,7 @@ def main():
     else:
         model = torch.nn.DataParallel(model).cuda()
     print(model)
+
     # optionally resume from a checkpoint
     if args.resume:
         if os.path.isfile(args.resume):
@@ -107,16 +110,20 @@ def main():
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+    ## Some pytorch optimization tool to make training faster. (Yet, it works well only if all the input data is the same size)
     cudnn.benchmark = True
+    
     # Data loading code
     # data_dir = places_dir + '/places365_standard_home'
     data_dir = places_dir   # check if that works
-
+    ## inside the data dir I have 2 folders - train & val
     traindir = os.path.join(data_dir, 'train')
     valdir = os.path.join(data_dir, 'val')
+
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
+    ## DataLoader provides an iterable over the given dataset
     train_loader = torch.utils.data.DataLoader(
         datasets.ImageFolder(traindir, transforms.Compose([
             transforms.RandomSizedCrop(224),
@@ -137,7 +144,7 @@ def main():
         batch_size=args.batch_size, shuffle=False,
         num_workers=args.workers, pin_memory=True)
 
-    # define loss function (criterion) and optimizer
+    ## define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
 
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
@@ -150,6 +157,7 @@ def main():
 
     accuracies_list = []    
     for epoch in range(args.start_epoch, args.epochs):
+        ## every 30 epochs the learning rate is divided by 10
         adjust_learning_rate(optimizer, epoch)
 
         # train for one epoch
@@ -172,6 +180,7 @@ def main():
     print("The best accuracy obtained during training is = {}".format(best_prec1))
 
 def train(train_loader, model, criterion, optimizer, epoch):
+    ## AverageMeter is a class to store the average current values
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
