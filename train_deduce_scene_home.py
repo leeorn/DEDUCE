@@ -23,6 +23,10 @@ import matplotlib.pyplot as plt
 import resnet
 from config import places_dir
 
+# measure how long it takes to run with Adam
+start_time = time.time()
+
+
 ## The name of the models (such as resnet18, AlexNet, etc.)
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
@@ -36,7 +40,7 @@ parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18',
                         ' | '.join(model_names) +
                         ' (default: resnet18)')
 ## the importance of this line is the number of workers which perform multi-process data loading
-parser.add_argument('-j', '--workers', default=1, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 ## the importance of this line is the number of epocs (the def is 90)
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -45,7 +49,7 @@ parser.add_argument('--epochs', default=90, type=int, metavar='N',
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 ## the importance of this line is the number of batch size
-parser.add_argument('-b', '--batch-size', default=1, type=int,
+parser.add_argument('-b', '--batch-size', default=128, type=int,
                     metavar='N', help='mini-batch size (default: 256)')
 ## the importance of this line is the learning rate (currently it's constant)
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
@@ -151,6 +155,9 @@ def main():
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
+    # # check results with ADAM (plain, no changes)
+    # optimizer = torch.optim.Adam(model.parameters())
+
     if args.evaluate:
         validate(val_loader, model, criterion)
         return
@@ -192,7 +199,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
     end = time.time()
     for i, (input, target) in enumerate(train_loader):
-        # measure data loading time
+        ## measure data loading time
         data_time.update(time.time() - end)
 
         target = target.cuda(async=True)
@@ -209,8 +216,11 @@ def train(train_loader, model, criterion, optimizer, epoch):
         top5.update(prec5, input.size(0))
 
         # compute gradient and do SGD step
+        ## zero_grad reset the optimizer object to zero to all of the gradients (need to reset every loop)
         optimizer.zero_grad()
+        ## compute gradient of the loss with respect to model param
         loss.backward()
+        ## calling the step function on an Optimizer makes an update to its parameters
         optimizer.step()
 
         # measure elapsed time
@@ -264,6 +274,7 @@ def validate(val_loader, model, criterion):
                     'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
                     i, len(val_loader), batch_time=batch_time, loss=losses,
                     top1=top1, top5=top5))
+                print("total time passed until now: ", time.time() - start_time)
 
     print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'
           .format(top1=top1, top5=top5))
