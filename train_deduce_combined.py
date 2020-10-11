@@ -20,7 +20,6 @@ import resnet
 import wideresnet
 import pdb
 import matplotlib.pyplot as plt
-import yolov3
 from yolov3.detect import detect
 from config import places_dir
 
