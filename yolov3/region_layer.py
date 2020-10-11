@@ -5,7 +5,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import bbox_iou, multi_bbox_ious, convert2cpu
+from yolov3.utils import bbox_iou, multi_bbox_ious, convert2cpu
 
 class RegionLayer(nn.Module):
     def __init__(self, num_classes=0, anchors=[1.0], num_anchors=1, use_cuda=None):
@@ -160,7 +160,7 @@ class RegionLayer(nn.Module):
         nProposals = int((conf > 0.25).sum())
 
         tcoord = tcoord.view(4, cls_anchor_dim).to(self.device)
-        tconf = tconf.view(cls_anchor_dim).to(self.device)        
+        tconf = tconf.view(cls_anchor_dim).to(self.device)
 
         conf_mask = (self.object_scale * obj_mask + self.noobject_scale * noobj_mask).view(cls_anchor_dim).to(self.device)
         obj_mask = obj_mask.view(cls_anchor_dim).to(self.device)
@@ -180,7 +180,7 @@ class RegionLayer(nn.Module):
             print('     build targets : %f' % (t3 - t2))
             print('       create loss : %f' % (t4 - t3))
             print('             total : %f' % (t4 - t0))
-        print('%d: nGT %3d, nRC %3d, nPP %3d, loss: box %6.3f, conf %6.3f, class %6.3f, total %7.3f' 
+        print('%d: nGT %3d, nRC %3d, nPP %3d, loss: box %6.3f, conf %6.3f, class %6.3f, total %7.3f'
             % (self.seen, nGT, nRecall, nProposals, loss_coord, loss_conf, loss_cls, loss))
         if math.isnan(loss.item()):
             print(conf, tconf)

@@ -5,7 +5,7 @@ import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import bbox_iou, multi_bbox_ious, convert2cpu
+from yolov3.utils import bbox_iou, multi_bbox_ious, convert2cpu
 
 class YoloLayer(nn.Module):
     def __init__(self, anchor_mask=[], num_classes=0, anchors=[1.0], num_anchors=1, use_cuda=None):
@@ -151,9 +151,9 @@ class YoloLayer(nn.Module):
         nProposals = int((conf > 0.25).sum())
 
         coord = coord[:,obj_mask]
-        tcoord = tcoord.view(4, cls_anchor_dim)[:,obj_mask].to(self.device)        
+        tcoord = tcoord.view(4, cls_anchor_dim)[:,obj_mask].to(self.device)
 
-        tconf = tconf.view(cls_anchor_dim).to(self.device)        
+        tconf = tconf.view(cls_anchor_dim).to(self.device)
 
         cls = cls[obj_mask,:].to(self.device)
         tcls = tcls.view(cls_anchor_dim, nC)[obj_mask,:].to(self.device)
@@ -174,7 +174,7 @@ class YoloLayer(nn.Module):
             print('     build targets : %f' % (t3 - t2))
             print('       create loss : %f' % (t4 - t3))
             print('             total : %f' % (t4 - t0))
-        print('%d: Layer(%03d) nGT %3d, nRC %3d, nRC75 %3d, nPP %3d, loss: box %6.3f, conf %6.3f, class %6.3f, total %7.3f' 
+        print('%d: Layer(%03d) nGT %3d, nRC %3d, nRC75 %3d, nPP %3d, loss: box %6.3f, conf %6.3f, class %6.3f, total %7.3f'
                 % (self.seen, self.nth_layer, nGT, nRecall, nRecall75, nProposals, loss_coord, loss_conf, loss_cls, loss))
         if math.isnan(loss.item()):
             print(coord, conf, tconf)
