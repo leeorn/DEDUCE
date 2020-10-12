@@ -264,14 +264,6 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(filename + '_latest_home.pth.tar', filename + '_best_home.pth.tar')
 
-# def early_stop(accu, )
-""" Function to determine if to use early stop (the model doesn't learn any more)
-    INPUT:  the accuracy of the current epoch; 
-            the number of epochs we want to wait before terminating (default=7);
-            by how much it needs to improve (default = 0% meaning, any improvement is sufficient) 
-    OUTPUT: True if continue learning (don't stop); False otherwise. """
-# use a stack to store the X accuracies, once the stack reached that amount, if the model doesn't improve, return false
-
 class AverageMeter(object):
     """Computes and stores the average and current value"""
     def __init__(self):
