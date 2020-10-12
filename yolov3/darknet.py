@@ -2,10 +2,10 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from cfg import *
+from yolov3.cfg import *
 import numpy as np
-from region_layer import RegionLayer
-from yolo_layer import YoloLayer
+from yolov3.region_layer import RegionLayer
+from yolov3.yolo_layer import YoloLayer
 #from layers.batchnorm.bn import BN2d
 
 class MaxPoolStride1(nn.Module):

@@ -2,9 +2,9 @@ import sys
 import time
 from PIL import Image, ImageDraw
 #from models.tiny_yolo import TinyYoloNet
-from utils import *
-from image import letterbox_image, correct_yolo_boxes
-from darknet import Darknet
+from yolov3.utils import *
+from yolov3.image import letterbox_image, correct_yolo_boxes
+from yolov3.darknet import Darknet
 
 namesfile=None
 def detect(cfgfile, weightfile, imgfile, namesfile):
